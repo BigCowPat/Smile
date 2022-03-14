@@ -4,8 +4,15 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def hello_world():
-    return 'hello, world!'
-# First lession done
+def render_homepage():
+    return render_template("home.html")
 
-app.run(host='0.0.0.0')
+@app.route('/menu')
+def render_homepage():
+    return render_template("menu.html")
+
+@app.route('/contact')
+def render_homepage():
+    return render_template("contact.html")
+
+app.run(host="0.0.0.0")
