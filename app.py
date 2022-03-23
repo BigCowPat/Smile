@@ -30,4 +30,7 @@ def render_contact():
 def render_login():
     return render_template("login.html")
 
+@app.route('/signup')
+def render_signup():
+    return render_template("signup.html")
 app.run(host="0.0.0.0")
