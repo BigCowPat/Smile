@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect
 
 app = Flask(__name__)
 
@@ -30,7 +30,13 @@ def render_contact():
 def render_login():
     return render_template("login.html")
 
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def render_signup():
+    print(request.form)
+    fname = request.form.get("fname")
+    lname = request.form.get("lname")
+    email = request.form.get("email")
+    password1 = request.form.get("password1")
+    password2 = request.form.get("password2")
     return render_template("signup.html")
 app.run(host="0.0.0.0")
