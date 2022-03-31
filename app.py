@@ -43,21 +43,30 @@ def render_login():
 
 @app.route('/signup', methods=['GET', 'POST'])
 def render_signup():
-    print(request.form)
-    fname = request.form.get("fname")
-    lname = request.form.get("lname")
-    email = request.form.get("email")
-    password1 = request.form.get("password1")
-    password2 = request.form.get("password2")
+    if request.method == 'POST':
+        print(request.form)
+        fname = request.form.get("fname").strip().title()
+        lname = request.form.get("lname").strip().title()
+        email = request.form.get("email").strip().lower()
+        password1 = request.form.get("password1")
+        password2 = request.form.get("password2")
 
-    con = create_connection(DB_NAME)
+        if password1 != password2:
+            return redirect('/signup?error=Passwords+dont+match')
+        if len(password1) < 8:
+            return redirect('/signup?error=Password+too+short')
 
-    query = "INSERT INTO customer(id, fname, lname, email, password) VALUES(NULL,?,?,?,?)"
+        con = create_connection(DB_NAME)
 
-    cur = con.cursor()  # I need this line next
-    cur.execute(query, (fname, lname, email, password1)) #this line executes the query
-    con.commit()
-    con.close()
+        query = "INSERT INTO customer(id, fname, lname, email, password) VALUES(NULL,?,?,?,?)"
+
+        cur = con.cursor()  # I need this line next
+        try:
+            cur.execute(query, (fname, lname, email, password1)) #this line executes the query
+        except sqlite3.IntegrityError:
+            return redirect('signup?=error+Email+is+already+used')
+        con.commit()
+        con.close()
 
     return render_template("signup.html")
 app.run(host="0.0.0.0")
