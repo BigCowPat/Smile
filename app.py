@@ -4,6 +4,7 @@ from sqlite3 import Error
 DB_NAME = "smile.db"
 
 app = Flask(__name__)
+app.secret_key = "b347fi34p9ygd23g7g2379xhj92p3hg4yz879r3dg8fi90243669420"
 
 def create_connection(db_file):
     try:
@@ -37,8 +38,26 @@ def render_menu():
 def render_contact():
     return render_template("contact.html")
 
-@app.route('/login')
+@app.route('/login' methods=['GET','POST'])
 def render_login():
+    if request.method == 'POST':
+        email = request.form['email'].lower().strip()
+        password1 = request.form['password1'].strip()
+
+        query = """SELECT id, fname, password FROM customer WHERE email = ?"""
+        con = create_connection(DB_NAME)
+        cur = con.cursor()
+        cur.execute(query, (email,))
+        user_data = cur.fetchall()
+        con.close()
+
+        try:
+            userid = user_data[0][0]
+            firstname = user_data[0][1]
+            db_password = user_data[0][2]
+        except IndexError:
+            return redirect("login?error=Email+invaild+or+password+incorrect")
+
     return render_template("login.html")
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -67,6 +86,7 @@ def render_signup():
             return redirect('signup?=error+Email+is+already+used')
         con.commit()
         con.close()
+        return redirect('/login')
 
     return render_template("signup.html")
 app.run(host="0.0.0.0")
